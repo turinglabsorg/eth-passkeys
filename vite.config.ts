@@ -7,6 +7,6 @@ export default defineConfig({
   plugins: [vue(), nodePolyfills()],
   base: "/eth-passkeys/",
   build: {
-    outDir: "demo",
+    outDir: "docs",
   },
 });
