@@ -45,9 +45,9 @@ const createWallet = async () => {
   });
   if (!signCredential) return;
   // Combine multiple sources of authenticator data
-  const authData = new Uint8Array(signCredential.response.authenticatorData);
+  const authData = new Uint8Array((signCredential as any).response.authenticatorData);
   const publicKeyBytes = authData.slice(-65);
-  const credentialId = new Uint8Array(signCredential.rawId);
+  const credentialId = new Uint8Array((signCredential as any).rawId);
 
   // Combine both sources into a single array
   const combinedData = new Uint8Array([...publicKeyBytes, ...credentialId]);
