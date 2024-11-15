@@ -36,16 +36,9 @@ export default function HomePage() {
     })
     if (regCredential) {
       console.log('regCredential', regCredential)
-      handlePasskeyUse()
+      alert('Passkey created correctly!')
     }
   }
-
-  const handlePasskeyUse = useCallback(async () => {
-    const restoredWallet = await createOrRestoreEIP155Wallet()
-    if (!restoredWallet) return
-    const eip155Addresses = restoredWallet.eip155Addresses
-    SettingsStore.setEIP155Address(eip155Addresses[0])
-  }, [])
 
   return (
     <Fragment>
