@@ -369,4 +369,8 @@ export abstract class SmartAccountLib implements EIP155Wallet {
     console.log({ userOpHash })
     return userOpHash
   }
+
+  public exportMnemonic(): Promise<string> {
+    throw new Error('Smart accounts do not support mnemonic export')
+  }
 }
