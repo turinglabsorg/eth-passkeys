@@ -1,4 +1,5 @@
 import PageHeader from '@/components/PageHeader'
+import EIP155Lib from '@/lib/EIP155Lib'
 import SettingsStore from '@/store/SettingsStore'
 import { createOrRestoreEIP155Wallet } from '@/utils/EIP155WalletUtil'
 import { Button, Text } from '@nextui-org/react'
@@ -6,8 +7,9 @@ import { Fragment, useCallback, useState } from 'react'
 import { useSnapshot } from 'valtio'
 
 export default function HomePage() {
-  const { eip155Address } = useSnapshot(SettingsStore.state)
   const [passKeyName, setPassKeyName] = useState('')
+  const [mnemonic, setMnemonic] = useState('')
+  const [isCalculating, setIsCalculating] = useState(false)
 
   const createPasskey = async () => {
     const challenge = crypto.getRandomValues(new Uint8Array(32))
@@ -40,18 +42,25 @@ export default function HomePage() {
     }
   }
 
+  const exportMnemonic = async () => {
+    setIsCalculating(true)
+    const exportedMnemonic = await EIP155Lib.prototype.exportMnemonic()
+    setMnemonic(exportedMnemonic)
+    setIsCalculating(false)
+  }
+
   return (
     <Fragment>
       <PageHeader title="Passkeys"></PageHeader>
       <Text h4 css={{ marginBottom: '$5' }}>
         Create passkeys
       </Text>
-      <input 
-        type="text" 
+      <input
+        type="text"
         value={passKeyName}
-        onChange={(e) => setPassKeyName(e.target.value)}
+        onChange={e => setPassKeyName(e.target.value)}
         placeholder="Enter passkey name"
-        style={{ 
+        style={{
           marginBottom: '10px',
           width: '100%',
           padding: '8px',
@@ -63,6 +72,30 @@ export default function HomePage() {
       <Button style={{ marginBottom: '20px', width: '100%' }} onClick={createPasskey}>
         Create Passkey
       </Button>
+      <hr></hr>
+      <Text h4 css={{ marginBottom: '$5' }}>
+        Export mnemonic
+      </Text>
+      <Button style={{ marginBottom: '20px', width: '100%' }} onClick={exportMnemonic} disabled={isCalculating}>
+        Export Mnemonic
+      </Button>
+      {mnemonic && (
+        <div
+          style={{
+            marginBottom: '20px',
+            width: '100%',
+            overflow: 'auto',
+            wordBreak: 'break-all',
+            fontFamily: 'monospace',
+            padding: '20px',
+            border: '1px solid #ccc',
+            borderRadius: '10px'
+          }}
+        >
+          {mnemonic}
+        </div>
+      )}
+      {isCalculating && <Text>Calculating...</Text>}
     </Fragment>
   )
 }

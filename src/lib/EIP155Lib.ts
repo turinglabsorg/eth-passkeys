@@ -1,4 +1,5 @@
 import { providers, Wallet } from 'ethers'
+import * as bip39 from 'bip39'
 
 /**
  * Types
@@ -7,6 +8,7 @@ export interface EIP155Wallet {
   getMnemonic(): string
   getPrivateKey(): string
   getAddress(): string
+  exportMnemonic(): Promise<string>
   signMessage(message: string): Promise<string>
   _signTypedData(domain: any, types: any, data: any, _primaryType?: string): Promise<string>
   connect(provider: providers.JsonRpcProvider): Promise<Wallet | undefined>
@@ -19,9 +21,10 @@ export interface EIP155Wallet {
 export default class EIP155Lib implements EIP155Wallet {
   wallet: {
     address: string
+    mnemonic?: string
   }
 
-  constructor(wallet: { address: string }) {
+  constructor(wallet: { address: string; mnemonic?: string }) {
     this.wallet = wallet
   }
 
@@ -45,24 +48,32 @@ export default class EIP155Lib implements EIP155Wallet {
 
     // Derive the key from the combined data
     const encryptionKey = await crypto.subtle.digest('SHA-256', combinedData)
-    const keyHex = Array.from(new Uint8Array(encryptionKey))
-      .map(b => b.toString(16).padStart(2, '0'))
-      .join('')
+    const keyBytes = new Uint8Array(encryptionKey)
 
-    // Create Ethereum wallet from the key
-    const wallet = new Wallet('0x' + keyHex)
-    console.log('Wallet address:', wallet.address)
-    return wallet
+    // Generate mnemonic from the encryption key using all 32 bytes (256 bits) of entropy
+    const mnemonic = bip39.entropyToMnemonic(Buffer.from(keyBytes))
+    // Create wallet from mnemonic
+    const wallet = Wallet.fromMnemonic(mnemonic)
+    return { wallet, mnemonic }
   }
 
   static async init() {
-    const wallet = await EIP155Lib.prototype.getWallet()
-    if (!wallet) return ''
-    return new EIP155Lib({ address: wallet.address })
+    const result = await EIP155Lib.prototype.getWallet()
+    if (!result) return ''
+    return new EIP155Lib({
+      address: result.wallet.address,
+      mnemonic: result.mnemonic
+    })
   }
 
   getMnemonic() {
-    return 'NO MNEMONIC WITH PASSKEY'
+    return this.wallet.mnemonic || 'NO MNEMONIC AVAILABLE'
+  }
+
+  async exportMnemonic() {
+    const wallet = await this.getWallet()
+    if (!wallet) return ''
+    return wallet.mnemonic
   }
 
   getPrivateKey() {
@@ -76,24 +87,24 @@ export default class EIP155Lib implements EIP155Wallet {
   async signMessage(message: string) {
     const wallet = await this.getWallet()
     if (!wallet) return ''
-    return wallet.signMessage(message)
+    return wallet.wallet.signMessage(message)
   }
 
   async _signTypedData(domain: any, types: any, data: any, _primaryType?: string) {
     const wallet = await this.getWallet()
     if (!wallet) return ''
-    return wallet._signTypedData(domain, types, data)
+    return wallet.wallet._signTypedData(domain, types, data)
   }
 
   async connect(provider: providers.JsonRpcProvider) {
     const wallet = await this.getWallet()
     if (!wallet) return
-    return wallet.connect(provider)
+    return wallet.wallet.connect(provider)
   }
 
   async signTransaction(transaction: providers.TransactionRequest) {
     const wallet = await this.getWallet()
     if (!wallet) return ''
-    return wallet.signTransaction(transaction)
+    return wallet.wallet.signTransaction(transaction)
   }
 }
