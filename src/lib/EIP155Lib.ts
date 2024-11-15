@@ -9,7 +9,7 @@ export interface EIP155Wallet {
   getAddress(): string
   signMessage(message: string): Promise<string>
   _signTypedData(domain: any, types: any, data: any, _primaryType?: string): Promise<string>
-  connect(provider: providers.JsonRpcProvider): Wallet
+  connect(provider: providers.JsonRpcProvider): Promise<Wallet | undefined>
   signTransaction(transaction: providers.TransactionRequest): Promise<string>
 }
 
@@ -57,6 +57,7 @@ export default class EIP155Lib implements EIP155Wallet {
 
   static async init() {
     const wallet = await EIP155Lib.prototype.getWallet()
+    if (!wallet) return ''
     return new EIP155Lib({ address: wallet.address })
   }
 
@@ -74,21 +75,25 @@ export default class EIP155Lib implements EIP155Wallet {
 
   async signMessage(message: string) {
     const wallet = await this.getWallet()
+    if (!wallet) return ''
     return wallet.signMessage(message)
   }
 
   async _signTypedData(domain: any, types: any, data: any, _primaryType?: string) {
     const wallet = await this.getWallet()
+    if (!wallet) return ''
     return wallet._signTypedData(domain, types, data)
   }
 
   async connect(provider: providers.JsonRpcProvider) {
     const wallet = await this.getWallet()
+    if (!wallet) return
     return wallet.connect(provider)
   }
 
   async signTransaction(transaction: providers.TransactionRequest) {
     const wallet = await this.getWallet()
+    if (!wallet) return ''
     return wallet.signTransaction(transaction)
   }
 }

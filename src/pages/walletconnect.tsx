@@ -48,9 +48,11 @@ export default function WalletConnectPage(params: { deepLink?: string }) {
   }, [deepLink])
 
   const { eip155Address } = useSnapshot(SettingsStore.state)
-  console.log('eip155Address', eip155Address)
+
   const handlePasskeyUse = useCallback(async () => {
-    const { eip155Addresses } = await createOrRestoreEIP155Wallet()
+    const restoredWallet = await createOrRestoreEIP155Wallet()
+    if (!restoredWallet) return
+    const eip155Addresses = restoredWallet.eip155Addresses
     SettingsStore.setEIP155Address(eip155Addresses[0])
   }, [])
 

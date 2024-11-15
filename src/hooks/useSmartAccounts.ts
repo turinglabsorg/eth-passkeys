@@ -17,24 +17,7 @@ export default function useSmartAccounts() {
     biconomySmartAccountEnabled
   } = useSnapshot(SettingsStore.state)
 
-  const initializeSmartAccounts = async (privateKey: string) => {
-    if (smartAccountEnabled) {
-      if (kernelSmartAccountEnabled) {
-        const { kernelSmartAccountAddress } = await createOrRestoreKernelSmartAccount(privateKey)
-        SettingsStore.setKernelSmartAccountAddress(kernelSmartAccountAddress)
-      }
-      if (safeSmartAccountEnabled) {
-        const { safeSmartAccountAddress } = await createOrRestoreSafeSmartAccount(privateKey)
-        SettingsStore.setSafeSmartAccountAddress(safeSmartAccountAddress)
-      }
-      if (biconomySmartAccountEnabled) {
-        const { biconomySmartAccountAddress } = await createOrRestoreBiconomySmartAccount(
-          privateKey
-        )
-        SettingsStore.setBiconomySmartAccountAddress(biconomySmartAccountAddress)
-      }
-    }
-  }
+  const initializeSmartAccounts = async (privateKey: string) => {}
 
   const getAvailableSmartAccounts = () => {
     if (!smartAccountEnabled) {

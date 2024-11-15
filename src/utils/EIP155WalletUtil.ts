@@ -15,6 +15,7 @@ let address2: string
  */
 export async function createOrRestoreEIP155Wallet() {
   const wallet1 = await EIP155Lib.init()
+  if (!wallet1) return
   const address1 = wallet1.getAddress()
   eip155Wallets = {
     [address1]: wallet1
