@@ -54,8 +54,8 @@ export default function HomePage() {
         open-source
       </a>{' '}
       proof of concept that explores the idea of creating an Ethereum wallet using Passkeys. You can
-      create a secure mnemonic and use it here, or, export it as a mnemonic and use it in any other
-      wallet.
+      create a secure wallet and use it here using Wallet Connect, or, export it as a mnemonic and
+      use it in any other wallet and use this website as a secure backup.
       <br />
       <br />
       <Text h4 css={{ marginBottom: '$5' }}>
