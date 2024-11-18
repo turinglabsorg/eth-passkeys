@@ -1,10 +1,7 @@
 import PageHeader from '@/components/PageHeader'
 import EIP155Lib from '@/lib/EIP155Lib'
-import SettingsStore from '@/store/SettingsStore'
-import { createOrRestoreEIP155Wallet } from '@/utils/EIP155WalletUtil'
 import { Button, Text } from '@nextui-org/react'
-import { Fragment, useCallback, useState } from 'react'
-import { useSnapshot } from 'valtio'
+import { Fragment, useState } from 'react'
 
 export default function HomePage() {
   const [passKeyName, setPassKeyName] = useState('')
@@ -51,15 +48,24 @@ export default function HomePage() {
 
   return (
     <Fragment>
-      <PageHeader title="Passkeys"></PageHeader>
+      <PageHeader title="🔑 ETH Passkeys"></PageHeader>
+      This is an{' '}
+      <a href="https://github.com/turinglabsorg/eth-passkeys" target="_blank" rel="noreferrer">
+        open-source
+      </a>{' '}
+      proof of concept that explores the idea of creating an Ethereum wallet using Passkeys. You can
+      create a secure mnemonic and use it here, or, export it as a mnemonic and use it in any other
+      wallet.
+      <br />
+      <br />
       <Text h4 css={{ marginBottom: '$5' }}>
-        Create passkeys
+        Create a wallet
       </Text>
       <input
         type="text"
         value={passKeyName}
         onChange={e => setPassKeyName(e.target.value)}
-        placeholder="Enter passkey name"
+        placeholder="Enter wallet name"
         style={{
           marginBottom: '10px',
           width: '100%',
@@ -76,23 +82,35 @@ export default function HomePage() {
       <Text h4 css={{ marginBottom: '$5' }}>
         Export mnemonic
       </Text>
-      <Button style={{ marginBottom: '20px', width: '100%' }} onClick={exportMnemonic} disabled={isCalculating}>
+      <Button
+        style={{ marginBottom: '20px', width: '100%' }}
+        onClick={exportMnemonic}
+        disabled={isCalculating}
+      >
         Export Mnemonic
       </Button>
       {mnemonic && (
-        <div
-          style={{
-            marginBottom: '20px',
-            width: '100%',
-            overflow: 'auto',
-            wordBreak: 'break-all',
-            fontFamily: 'monospace',
-            padding: '20px',
-            border: '1px solid #ccc',
-            borderRadius: '10px'
-          }}
-        >
-          {mnemonic}
+        <div>
+          <div
+            style={{
+              marginBottom: '20px',
+              width: '100%',
+              overflow: 'auto',
+              wordBreak: 'break-all',
+              fontFamily: 'monospace',
+              padding: '20px',
+              border: '1px solid #ccc',
+              borderRadius: '10px'
+            }}
+          >
+            {mnemonic}
+          </div>
+          <Button
+            style={{ marginBottom: '20px', width: '100%' }}
+            onClick={() => navigator.clipboard.writeText(mnemonic)}
+          >
+            Copy to clipboard
+          </Button>
         </div>
       )}
       {isCalculating && <Text>Calculating...</Text>}

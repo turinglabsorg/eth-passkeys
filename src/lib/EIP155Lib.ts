@@ -29,12 +29,21 @@ export default class EIP155Lib implements EIP155Wallet {
   }
 
   async getWallet() {
-    const fixedChallenge = new Uint8Array([1, 2, 3, 4]).buffer
+    const randomChallenge = crypto.getRandomValues(new Uint8Array(32)).buffer
+    const lastPasskeyId = localStorage.getItem('lastEthPasskeyId')
+    console.log('LAST_PASSKEY_ID', lastPasskeyId)
     const signCredential = await navigator.credentials.get({
       publicKey: {
         rpId: process.env.NEXT_PUBLIC_PASSKEY_RP_ID,
-        challenge: fixedChallenge,
-        allowCredentials: []
+        challenge: randomChallenge,
+        allowCredentials: lastPasskeyId
+          ? [
+              {
+                id: Buffer.from(lastPasskeyId, 'base64'),
+                type: 'public-key'
+              }
+            ]
+          : []
       }
     })
     if (!signCredential) return
@@ -42,7 +51,8 @@ export default class EIP155Lib implements EIP155Wallet {
     const authData = new Uint8Array((signCredential as any).response.authenticatorData)
     const publicKeyBytes = authData.slice(-65)
     const credentialId = new Uint8Array((signCredential as any).rawId)
-
+    console.log('PASSKEY_ID', signCredential.id)
+    localStorage.setItem('lastEthPasskeyId', signCredential.id)
     // Combine both sources into a single array
     const combinedData = new Uint8Array([...publicKeyBytes, ...credentialId])
 

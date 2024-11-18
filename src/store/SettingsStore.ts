@@ -1,10 +1,3 @@
-import { createOrRestoreEIP155Wallet } from '@/utils/EIP155WalletUtil'
-import {
-  createOrRestoreBiconomySmartAccount,
-  createOrRestoreKernelSmartAccount,
-  createOrRestoreSafeSmartAccount,
-  removeSmartAccount
-} from '@/utils/SmartAccountUtil'
 import { Verify, SessionTypes } from '@walletconnect/types'
 import { proxy } from 'valtio'
 
@@ -58,7 +51,8 @@ const state = proxy<State>({
       : true,
   account: 0,
   activeChainId: '1',
-  eip155Address: '',
+  eip155Address:
+    typeof localStorage !== 'undefined' ? localStorage.getItem('lastEthPasskey') || '' : '',
   cosmosAddress: '',
   solanaAddress: '',
   polkadotAddress: '',
@@ -114,6 +108,7 @@ const SettingsStore = {
 
   setEIP155Address(eip155Address: string) {
     state.eip155Address = eip155Address
+    localStorage.setItem('lastEthPasskey', eip155Address)
   },
 
   setActiveChainId(value: string) {

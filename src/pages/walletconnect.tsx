@@ -50,23 +50,35 @@ export default function WalletConnectPage(params: { deepLink?: string }) {
   const { eip155Address } = useSnapshot(SettingsStore.state)
 
   const handlePasskeyUse = useCallback(async () => {
+    setLoading(true)
+    localStorage.removeItem('lastEthPasskeyId')
     const restoredWallet = await createOrRestoreEIP155Wallet()
-    if (!restoredWallet) return
+    if (!restoredWallet) {
+      setLoading(false)
+      return
+    }
+    setLoading(false)
     const eip155Addresses = restoredWallet.eip155Addresses
     SettingsStore.setEIP155Address(eip155Addresses[0])
   }, [])
 
   return (
     <Fragment>
-      <PageHeader title="Use any dApp" />
-      {eip155Address ? (
+      <PageHeader title="Connect to dApp" />
+      {eip155Address && !loading ? (
         <>
-          <Text size={13} css={{ textAlign: 'center', marginTop: '$10', marginBottom: '$10' }}>
-            Connected wallet: {eip155Address}
+          <Text css={{ textAlign: 'center', marginTop: '$10' }}>Using wallet:</Text>
+          <Text size={13} css={{ textAlign: 'center', marginBottom: '$10' }}>
+            {eip155Address}
           </Text>
+          <Button
+            style={{ marginTop: '20px', width: '100%', marginBottom: '20px' }}
+            onClick={handlePasskeyUse}
+          >
+            Change wallet
+          </Button>
           <QrReader onConnect={onConnect} />
-
-          {/* <Text size={13} css={{ textAlign: 'center', marginTop: '$10', marginBottom: '$10' }}>
+          <Text size={13} css={{ textAlign: 'center', marginTop: '$10', marginBottom: '$10' }}>
             or use walletconnect uri
           </Text>
 
@@ -90,15 +102,17 @@ export default function WalletConnectPage(params: { deepLink?: string }) {
                 {loading ? <Loading size="md" type="points" color={'white'} /> : 'Connect'}
               </Button>
             }
-          /> */}
+          />
         </>
-      ) : (
+      ) : !loading ? (
         <div style={{ textAlign: 'center', marginTop: '20px' }}>
           You need to connect a wallet first.
           <Button style={{ marginTop: '20px', width: '100%' }} onClick={handlePasskeyUse}>
             Use an existing Passkey
           </Button>
         </div>
+      ) : (
+        <Text>Loading key...</Text>
       )}
     </Fragment>
   )
