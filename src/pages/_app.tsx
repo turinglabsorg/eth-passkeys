@@ -1,7 +1,7 @@
 import { Toaster } from 'react-hot-toast'
 import { useEffect } from 'react'
 import { createTheme, NextUIProvider } from '@nextui-org/react'
-
+import Head from 'next/head'
 import Layout from '@/components/Layout'
 import Modal from '@/components/Modal'
 import useInitialization from '@/hooks/useInitialization'
@@ -30,6 +30,11 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [initialized])
   return (
     <NextUIProvider theme={createTheme({ type: 'dark' })}>
+      <Head>
+        <title>Eth Passkeys</title>
+        <link rel="icon" href="/favicon.png" type="image/png" />
+        <meta name="description" content="Eth Passkeys | A new way to generate and store Ethereum Wallets using Passkeys" />
+      </Head>
       <Layout initialized={initialized}>
         <Toaster />
         <Component {...pageProps} />
